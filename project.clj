@@ -19,12 +19,12 @@
                  [org.slf4j/jul-to-slf4j "1.7.26"]
                  [org.slf4j/log4j-over-slf4j "1.7.26"]]
   :plugins [[lein-environ "1.1.0"]
-            [lein-cljfmt "0.6.3"]
+            [lein-cljfmt "0.6.4"]
             [lein-kibit "0.1.6"]
             [lein-figwheel "0.5.18"]]
   :min-lein-version "2.0.0"
   :resource-paths ["config", "resources"]
-  :profiles {:dev {:aliases {"run-dev" ["trampoline" "run" "-m" "social-stats-bot.server/run-dev"]}
+  :profiles {:dev {:aliases {"run-dev" ["trampoline" "run" "-m" "web.server/run-dev"]}
                    :dependencies [[io.pedestal/pedestal.service-tools "0.5.7"]]}
-             :uberjar {:aot [social-stats-bot.server]}}
-  :main ^{:skip-aot true} social-stats-bot.server)
+             :uberjar {:aot [web.server]}}
+  :main ^{:skip-aot true} web.server)

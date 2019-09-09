@@ -1,8 +1,8 @@
-(ns social-stats-bot.server
+(ns web.server
   (:gen-class) ; for -main method in uberjar
   (:require [io.pedestal.http :as server]
             [io.pedestal.http.route :as route]
-            [social-stats-bot.service :as service]))
+            [web.service :as service]))
 
 ;; This is an adapted service map, that can be started and stopped
 ;; From the REPL you can call server/start and server/stop on this service
