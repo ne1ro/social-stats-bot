@@ -1,13 +1,29 @@
 (ns social-stats-bot.core
-  "Application layer of social stats bot"
-  (:require [social-stats-bot.domain :as domain]))
+  "Entry point to the application"
+  (:require [integrant.core :as ig]))
 
-(defn get-user
-  "Gets a user by his or her nickname and social acc provider"
-  [nickname provider]
-  {})
+(defn config [env]
+  (-> env (str "/config.edn") clojure.java.io/resource slurp ig/read-string))
 
-(defn get-stats
-  "Gets stats for a social account by user nickname and provider"
-  [nickname provider]
-  {})
+(defn start
+  "Starts a system"
+  [env]
+  (ig/init (config env)))
+
+(defn stop
+  "Stops a system"
+  []
+  (ig/halt!))
+
+(defn -main
+  "The entry-point for 'lein run'"
+  [& args]
+  (println "\nRunning a system...")
+  (let [env (or (System/getenv "ENV") "dev")]
+    (start env)))
+
+;; (with-handler :term
+;;   (log/info "Caught SIGTERM, quitting")
+;;   (system-stop)
+;;   (log/info "All components shut down")
+;;   (exit))

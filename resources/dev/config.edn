@@ -1,0 +1,3 @@
+{:web {:port 8080}
+ :workers-pool {:max-workers 20}
+ :persistence {:db-name "social-stats"}}
