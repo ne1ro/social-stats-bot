@@ -1,19 +1,25 @@
 (ns social-stats-bot.core
   "Entry point to the application"
-  (:require [integrant.core :as ig]))
+  (:require [integrant.core :as ig]
+            [social-stats-bot.use-cases]
+            [persistence.datomic]))
+
+(def ^:private system (atom nil))
+
+(def ^:private alter-system (partial alter-var-root #'system))
 
 (defn config [env]
-  (-> env (str "/config.edn") clojure.java.io/resource slurp ig/read-string))
+  (some-> env (str "/config.edn") clojure.java.io/resource slurp ig/read-string))
 
 (defn start
   "Starts a system"
   [env]
-  (ig/init (config env)))
+  (-> env config ig/init constantly alter-system))
 
 (defn stop
   "Stops a system"
   []
-  (ig/halt!))
+  (alter-system ig/halt!))
 
 (defn -main
   "The entry-point for 'lein run'"

@@ -1,3 +1,5 @@
-{:web {:port 8080}
- :workers-pool {:max-workers 20}
- :persistence {:db-name "social-stats"}}
+{
+ :use-cases {:db #ig/ref :datomic}
+ :web {:port 8080 :use-cases #ig/ref :use-cases}
+ :datomic {:db-name "social-stats"}
+}

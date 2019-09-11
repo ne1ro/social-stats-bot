@@ -17,7 +17,7 @@
 (s/def ::user
   (s/keys :req [::first-name ::provider ::nickname]
           :opt [::last-name ::avatar ::posts-count
-                :followers-count ::followings-count
+                ::followers-count ::followings-count
                 ::last-fetched-at ::inserted-at]))
 
 ;; Stats attributes
@@ -26,5 +26,5 @@
 (s/def ::split-by #{:month :day :week})
 (s/def ::graph string?)
 
-(s/def ::stats-params (s/keys :req [::start-date ::end-date ::split-by]))
-(s/def ::stats (s/keys :req [::user ::graph ::stats-params]))
+(s/def ::stats-params (s/keys :req [::start-date ::end-date ::split-by] :opt []))
+(s/def ::stats (s/keys :req [::user ::graph ::stats-params] :opt []))
