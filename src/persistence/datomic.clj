@@ -1,7 +1,7 @@
 (ns persistence.datomic
   "Datomic DB adapter for persistence port"
-  (:require [integrant.core :as ig])
-  (:import [social_stats_bot.persistence Persistence]))
+  (:require [integrant.core :as ig]
+            [social-stats-bot.persistence :refer [Persistence]]))
 
 (defrecord Datomic
     [conn]
@@ -14,7 +14,6 @@
   (user-exists? [conn nickname provider])
 
   (list-stats [this nickname provider stats-params]))
-
 
 (defmethod ig/init-key :datomic [_ {:keys [db]}] (->Datomic db))
 

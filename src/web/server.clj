@@ -1,6 +1,7 @@
 (ns web.server
   (:gen-class) ; for -main method in uberjar
-  (:require [io.pedestal.http :as server]
+  (:require [integrant.core :as ig]
+            [io.pedestal.http :as server]
             [io.pedestal.http.route :as route]
             [web.service :as service]))
 
@@ -29,12 +30,6 @@
       server/create-server
       server/start))
 
-(defn -main
-  "The entry-point for 'lein run'"
-  [& args]
-  (println "\nCreating your server...")
-  (server/start runnable-service))
-
 ;; If you package the service up as a WAR,
 ;; some form of the following function sections is required (for io.pedestal.servlet.ClojureVarServlet).
 
@@ -54,3 +49,8 @@
 ;;  (server/servlet-destroy @servlet)
 ;;  (reset! servlet nil))
 
+
+(defmethod ig/init-key :web [_ {:keys [use-cases]}]
+  (server/start runnable-service))
+
+(defmethod ig/halt-key! :datomic [_ _] (server/stop runnable-service))
