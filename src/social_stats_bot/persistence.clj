@@ -8,10 +8,6 @@
 
   (insert-user [this user-params] "Inserts an user")
 
-  (user-exists?
-    [this nickname provider]
-    "Checks if user with nickname and provider exists")
-
   (list-stats
     [this nickname provider stats-params]
     "Returns user stats by params"))

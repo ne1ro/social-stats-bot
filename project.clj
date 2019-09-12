@@ -13,7 +13,6 @@
                  [io.pedestal/pedestal.jetty "0.5.7"]
                  [io.pedestal/pedestal.service "0.5.7"]
                  [morse "0.4.3"]
-                 [orchestra "2018.12.06-2"]
                  [org.clojure/core.async "0.4.490"]
                  [org.jsoup/jsoup "1.12.1"]
                  [org.slf4j/jcl-over-slf4j "1.7.26"]

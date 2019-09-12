@@ -11,8 +11,6 @@
 
   (insert-user [conn user-params])
 
-  (user-exists? [conn nickname provider])
-
   (list-stats [this nickname provider stats-params]))
 
 (defmethod ig/init-key :datomic [_ {:keys [db]}] (->Datomic db))
