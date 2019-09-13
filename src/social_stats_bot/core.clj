@@ -1,9 +1,11 @@
 (ns social-stats-bot.core
   "Entry point to the application"
+  (:gen-class) ; for -main method in uberjar
   (:require [integrant.core :as ig]
             [clojure.spec.alpha :as s]
             [clojure.spec.test.alpha :as st]
             [social-stats-bot.use-cases]
+            [web.server]
             [persistence.datomic]))
 
 (s/def ::env #{"dev" "test" "prod"})
@@ -36,6 +38,7 @@
 (defn stop
   "Stops a system"
   []
+  (println "\nStopping a system...")
   (alter-system ig/halt!))
 
 (defn -main
