@@ -4,6 +4,7 @@
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.10.1"]
+                 [clj-http "3.10.0"]
                  [com.github.javafaker/javafaker "0.16"]
                  [compojure "1.6.1"]
                  [dorothy "0.0.7"]
@@ -12,9 +13,8 @@
                  [io.aviso/pretty "0.1.37"]
                  [morse "0.4.3"]
                  [org.clojure/core.async "0.4.490"]
-                 [org.jsoup/jsoup "1.12.1"]
-                 [ring/ring-json "0.5.0"]
                  [ring/ring-jetty-adapter "1.7.1"]
+                 [ring/ring-json "0.5.0"]
                  [ring-logger "1.0.1"]]
   :plugins [[lein-environ "1.1.0"]
             [lein-cljfmt "0.6.4"]
