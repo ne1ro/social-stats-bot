@@ -11,9 +11,21 @@
 (def ^:private system (atom nil))
 (def ^:private alter-system (partial alter-var-root #'system))
 
+(defn tag-env
+  "Implements #env extension for EDN files"
+  [vr]
+  (cond
+    (symbol? vr) (System/getenv (name vr))
+    (string? vr) (System/getenv vr)
+    :else (throw (new Exception "Wrong var type!"))))
+
 (s/fdef config :args (s/cat :env ::env) :ret map?)
 (defn config [env]
-  (some-> env (str "/config.edn") clojure.java.io/resource slurp ig/read-string))
+  (some->> "/config.edn"
+          (str env)
+          clojure.java.io/resource
+          slurp
+          (ig/read-string {:readers {'env tag-env}})))
 
 (s/fdef start :args (s/cat :env ::env) :ret map?)
 (defn start
@@ -33,7 +45,6 @@
   (let [env (or (System/getenv "ENV") "dev")]
     (start env)))
 
-(-main)
 (st/instrument `config `start)
 
 ;; (with-handler :term

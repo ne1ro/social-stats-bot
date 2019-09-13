@@ -1,59 +1,34 @@
 (ns web.server
   (:gen-class) ; for -main method in uberjar
   (:require [integrant.core :as ig]
-            [io.pedestal.http :as server]
-            [io.pedestal.http.route :as route]
-            [web.service :as service]
-            [clojure.spec.alpha :as s]))
+            [compojure.core :refer :all]
+            [compojure.route :as route]
+            [ring.adapter.jetty :as jetty]
+            [morse.api :as telegram]
+            [clojure.spec.alpha :as s]
+            [clojure.spec.test.alpha :as st]
+            [web.service :as service]))
 
-(def ^:private runned-service (atom nil))
-(def ^:private alter-runned-service (partial alter-var-root #'runned-service))
+(s/def ::env #{:dev :test :prod})
+(s/def ::port pos-int?)
+(s/def ::telegram-token string?)
+(s/def ::endpoint string?)
+(s/def ::conf
+  (s/keys :req [::env ::port ::telegram-token]
+          :opt [::endpoint]))
 
-(deref runned-service)
+(defroutes app-routes
+  (POST "/handler" {{updates :result} :body} (map service/bot-handler updates))
+  (route/not-found "Not Found"))
 
-(defn run-dev
-  "The entry-point for 'lein run-dev'"
-  [& args]
-  (println "\nCreating your [DEV] server...")
-  (-> service/service ;; start with production configuration
-      (merge {:env :dev
-              ;; do not block thread that starts web server
-              ::server/join? false
-              ;; Routes can be a function that resolve routes,
-              ;;  we can use this to set the routes to be reloadable
-              ::server/routes #(route/expand-routes (deref #'service/routes))
-              ;; all origins are allowed in dev mode
-              ::server/allowed-origins {:creds true :allowed-origins (constantly true)}
-              ;; Content Security Policy (CSP) is mostly turned off in dev mode
-              ::server/secure-headers {:content-security-policy-settings {:object-src "'none'"}}})
-      ;; Wire up interceptor chains
-      server/default-interceptors
-      server/dev-interceptors
-      server/create-server
-      server/start))
+(s/fdef server :args (s/cat :conf ::conf) :ret map?)
+(defn server [{token ::telegram-token endpoint ::endpoint}]
+  (telegram/set-webhook token endpoint)
+  app-routes)
 
-;; If you package the service up as a WAR,
-;; some form of the following function sections is required (for io.pedestal.servlet.ClojureVarServlet).
+(defmethod ig/init-key :web [_ {port ::port :as conf}]
+  (jetty/run-jetty (-> conf (dissoc :use-cases) server) {:port port}))
 
-;;(defonce servlet  (atom nil))
-;;
-;;(defn servlet-init
-;;  [_ config]
-;;  ;; Initialize your app here.
-;;  (reset! servlet  (server/servlet-init service/service nil)))
-;;
-;;(defn servlet-service
-;;  [_ request response]
-;;  (server/servlet-service @servlet request response))
-;;
-;;(defn servlet-destroy
-;;  [_]
-;;  (server/servlet-destroy @servlet)
-;;  (reset! servlet nil))
-(defmethod ig/init-key :web [_ conf]
-  (let [srvc (-> service/service (merge conf) server/create-server)]
-    (prn srvc "WEB:" conf)
-    (alter-runned-service srvc)
-    (server/start srvc)))
+(defmethod ig/halt-key! :web [_ server] (.stop server))
 
-(defmethod ig/halt-key! :web [_ _] (server/stop @runned-service))
+(st/instrument)
