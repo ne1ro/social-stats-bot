@@ -12,7 +12,7 @@
 (defn- draw-graph [db nickname provider graph stats-params user]
   (some-> db
           (p/list-stats nickname provider stats-params)
-          #(g/draw-user-stats graph % stats-params)))
+          #(g/draw-user-stats graph user % stats-params)))
 
 ;; Procotol for social stats use cases
 (defprotocol SocialStatsBot

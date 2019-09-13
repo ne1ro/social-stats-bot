@@ -3,11 +3,13 @@
   (:require [integrant.core :as ig]
             [io.pedestal.http :as server]
             [io.pedestal.http.route :as route]
-            [web.service :as service]))
+            [web.service :as service]
+            [clojure.spec.alpha :as s]))
 
-;; This is an adapted service map, that can be started and stopped
-;; From the REPL you can call server/start and server/stop on this service
-(defonce runnable-service (server/create-server service/service))
+(def ^:private runned-service (atom nil))
+(def ^:private alter-runned-service (partial alter-var-root #'runned-service))
+
+(deref runned-service)
 
 (defn run-dev
   "The entry-point for 'lein run-dev'"
@@ -48,9 +50,10 @@
 ;;  [_]
 ;;  (server/servlet-destroy @servlet)
 ;;  (reset! servlet nil))
+(defmethod ig/init-key :web [_ conf]
+  (let [srvc (-> service/service (merge conf) server/create-server)]
+    (prn srvc "WEB:" conf)
+    (alter-runned-service srvc)
+    (server/start srvc)))
 
-
-(defmethod ig/init-key :web [_ {:keys [use-cases]}]
-  (server/start runnable-service))
-
-(defmethod ig/halt-key! :datomic [_ _] (server/stop runnable-service))
+(defmethod ig/halt-key! :web [_ _] (server/stop @runned-service))

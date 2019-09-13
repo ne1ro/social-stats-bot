@@ -33,6 +33,7 @@
   (let [env (or (System/getenv "ENV") "dev")]
     (start env)))
 
+(-main)
 (st/instrument `config `start)
 
 ;; (with-handler :term

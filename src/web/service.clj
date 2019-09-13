@@ -27,7 +27,6 @@
 ;      ^:interceptors [(body-params/body-params) http/html-body]
 ;      ["/about" {:get about-page}]]]])
 
-
 ;; Consumed by social-stats-bot.server/create-server
 ;; See http/default-interceptors for additional options you can configure
 (def service {:env :prod
@@ -55,13 +54,13 @@
               ;;                                                          :frame-ancestors "'none'"}}
 
               ;; Root for resource interceptor that is available by default.
-              ::http/resource-path "/public"
+              ;; ::http/resource-path "/public"
 
               ;; Either :jetty, :immutant or :tomcat (see comments in project.clj)
               ;;  This can also be your own chain provider/server-fn -- http://pedestal.io/reference/architecture-overview#_chain_provider
               ::http/type :jetty
               ;;::http/host "localhost"
-              ::http/port 8080
+              ::http/port 8000
               ;; Options to pass to the container (Jetty)
               ::http/container-options {:h2c? true
                                         :h2? false
