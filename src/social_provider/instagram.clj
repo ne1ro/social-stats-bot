@@ -1,9 +1,7 @@
 (ns social-provider.instagram
   (:require [social-stats-bot.social-provider :refer [SocialProvider]]
+            [integrant.core :as ig]
             [clj-http.client :as http]))
-
-(def base-route "https://www.instagram.com/")
-(def appendix "/?__a=1")
 
 (defn- parse-names [fullname]
   (as-> fullname $ (clojure.string/split $ #" ") (take 2 $)))
@@ -21,16 +19,17 @@
      :followers-count (:count edge_followed_by)
      :followings-count (:count edge_follow)}))
 
-(defn- fetch-acc [nickname]
-  (some->
-   base-route
-   (str nickname appendix)
-   (http/get {:accept :json :as :json})
-   (get-in [:body :graphql :user])
-   compose-profile))
-
 (defrecord Instagram
-           [this]
+           [conf]
   SocialProvider
 
-  (fetch-user [this nickname] (fetch-acc nickname)))
+  (fetch-user [{{:keys [base-url suffix]} :conf} nickname]
+    (some->
+     base-url
+     (str nickname suffix)
+     (http/get {:accept :json :as :json})
+     (get-in [:body :graphql :user])
+     compose-profile)))
+
+(defmethod ig/init-key :instagram [_ conf] (->Instagram conf))
+(defmethod ig/halt-key! :instagram [_ _] nil)

@@ -5,13 +5,13 @@
             [clojure.spec.alpha :as s]
             [clojure.spec.test.alpha :as st]
             [social-stats-bot.use-cases]
+            [social-provider.instagram]
             [web.server]
             [persistence.datomic]))
 
 (s/def ::env #{"dev" "test" "prod"})
 
-(def ^:private system (atom nil))
-(def ^:private alter-system (partial alter-var-root #'system))
+(defonce system (atom nil))
 
 (defn tag-env
   "Implements #env extension for EDN files"
@@ -33,13 +33,13 @@
 (defn start
   "Starts a system"
   [env]
-  (-> env config ig/init constantly alter-system))
+  (->> env config ig/init constantly (alter-var-root #'system)))
 
 (defn stop
   "Stops a system"
   []
   (println "\nStopping a system...")
-  (alter-system ig/halt!))
+  (ig/halt! @system))
 
 (defn -main
   "The entry-point for 'lein run'"

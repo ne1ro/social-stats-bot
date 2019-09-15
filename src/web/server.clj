@@ -16,14 +16,12 @@
 (s/def ::endpoint string?)
 (s/def ::use-cases map?)
 (s/def ::conf
-  (s/keys :req [::env ::port ::telegram-token ::use-cases]
-          :opt [::endpoint]))
+  (s/keys :req [::env ::port ::telegram-token ::use-cases ::endpoint]))
 
 (defn app-routes [token endpoint use-cases]
-  (routes (POST "/handler"
-                {body :body}
-                ((service/get-bot token endpoint use-cases) body))
-          (route/not-found "Not Found")))
+  (let [handler (service/get-bot token endpoint use-cases)]
+    (routes (POST "/handler" {body :body} (handler body))
+            (route/not-found "Not Found"))))
 
 (s/fdef server :args (s/cat :conf ::conf) :ret map?)
 (defn server [{token ::telegram-token endpoint ::endpoint use-cases ::use-cases}]
@@ -33,6 +31,8 @@
       logger/wrap-log-request-start
       logger/wrap-log-request-params
       logger/wrap-log-response))
+
+(defmethod ig/pre-init-spec ::web [_] ::conf)
 
 (defmethod ig/init-key :web [_ {port ::port :as conf}]
   (jetty/run-jetty (-> conf (dissoc :use-cases) server) {:port port}))
