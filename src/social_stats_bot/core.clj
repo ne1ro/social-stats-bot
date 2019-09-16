@@ -45,8 +45,9 @@
   "The entry-point for 'lein run'"
   [& args]
   (println "\nRunning a system...")
-  (let [env (or (System/getenv "ENV") "dev")]
-    (start env)))
+  (let [env (or (System/getenv "ENV") "dev")] (start env)))
+
+;; (-main)
 
 (st/instrument `config `start)
 
