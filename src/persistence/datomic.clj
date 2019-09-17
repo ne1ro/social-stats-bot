@@ -49,13 +49,17 @@
     :db/valueType :db.type/instant
     :db/cardinality :db.cardinality/one}])
 
+(def user-query '[:find  (pull ?e [*])
+                  :where [?nickname :user/nickname ?provider :user/provider]])
+
 (defrecord Datomic
            [conn]
   Persistence
 
-  (get-user [conn nickname provider])
+  (get-user [conn nickname provider]
+    (d/q user-query (d/db conn) nickname provider))
 
-  (insert-user [conn user-params])
+  (insert-user [conn user-params] (d/transact conn {:tx-data [user-params]}))
 
   (list-stats [this nickname provider stats-params]))
 
