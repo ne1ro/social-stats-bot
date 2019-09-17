@@ -20,6 +20,7 @@
            first-name last-name nickname]}]
   (let [lines [(str first-name " " last-name)
                (str "@" nickname)
+               (str "=============")
                (str "Posts count: " posts-count)
                (str "Followers count: " followers-count)
                (str "Followings count: " followings-count)]]
@@ -28,7 +29,6 @@
 (defn- get-account [use-cases token {{chat-id :id} :chat command :text}]
   (let [[_ username] (str/split command #" ")
         {avatar :avatar :as u} (.get-user use-cases username default-provider)]
-    (prn u)
     (t/send-photo token chat-id avatar)
     (t/send-text token chat-id (show-user-info u))))
 

@@ -12,13 +12,11 @@
 (s/def ::last-name string?)
 (s/def ::nickname string?)
 (s/def ::last-fetched-at inst?)
-(s/def ::inserted-at inst?)
 
 (s/def ::user
   (s/keys :req [::first-name ::provider ::nickname]
-          :opt [::last-name ::avatar ::posts-count
-                ::followers-count ::followings-count
-                ::last-fetched-at ::inserted-at]))
+          :opt [::last-name ::avatar ::posts-count ::followers-count
+                ::followings-count ::last-fetched-at]))
 
 ;; Stats attributes
 (s/def ::start-date inst?)

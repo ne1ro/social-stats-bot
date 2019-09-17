@@ -47,9 +47,9 @@
   (println "\nRunning a system...")
   (let [env (or (System/getenv "ENV") "dev")] (start env)))
 
-;; (-main)
+(-main)
 
-(st/instrument `config `start)
+(st/instrument)
 
 ;; (with-handler :term
 ;;   (log/info "Caught SIGTERM, quitting")
