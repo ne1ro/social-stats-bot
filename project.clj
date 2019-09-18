@@ -25,10 +25,10 @@
   :middleware [io.aviso.lein-pretty/inject]
   :min-lein-version "2.0.0"
   :resource-paths ["config", "resources"]
-  :profiles {:dev {:aliases {"run-dev" ["trampoline" "run" "-m" "web.server/run-dev"]}
-                   :resource-paths ["resources/dev"]
+  :profiles {:dev {:resource-paths ["resources/dev"]
                    :dependencies [[integrant/repl "0.3.1"]]}
-             :test {:resource-paths ["resources/test"]}
+             :test {:resource-paths ["resources/test"]
+                    :dependencies [[lein-cloverage "1.1.1"]]}
              :prod {:resource-paths ["resources/prod"]}
              :uberjar {:aot [social-stats-bot.core]}}
   :main ^{:skip-aot true} social-stats-bot.core)

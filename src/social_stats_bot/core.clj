@@ -4,10 +4,11 @@
   (:require [integrant.core :as ig]
             [clojure.spec.alpha :as s]
             [clojure.spec.test.alpha :as st]
-            [social-stats-bot.use-cases]
+            [messenger.telegram]
+            [persistence.datomic]
             [social-provider.instagram]
-            [web.server]
-            [persistence.datomic]))
+            [social-stats-bot.use-cases]
+            [web.server]))
 
 (s/def ::env #{"dev" "test" "prod"})
 
@@ -24,10 +25,10 @@
 (s/fdef config :args (s/cat :env ::env) :ret map?)
 (defn config [env]
   (some->> "/config.edn"
-          (str env)
-          clojure.java.io/resource
-          slurp
-          (ig/read-string {:readers {'env tag-env}})))
+           (str env)
+           clojure.java.io/resource
+           slurp
+           (ig/read-string {:readers {'env tag-env}})))
 
 (s/fdef start :args (s/cat :env ::env) :ret map?)
 (defn start

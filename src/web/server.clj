@@ -1,10 +1,10 @@
 (ns web.server
   (:require [integrant.core :as ig]
+            ;; [ring.middleware.reload :refer [wrap-reload]
             [clojure.spec.alpha :as s]
             [clojure.spec.test.alpha :as st]
-            [compojure.core :refer :all]
-            [compojure.route :as route]
-            ;; [ring.middleware.reload :refer [wrap-reload]
+            [compojure.core :refer [routes POST]]
+            [compojure.route :refer [not-found]]
             [ring.adapter.jetty :as jetty]
             [ring.logger :as logger]
             [ring.middleware.json :refer [wrap-json-body]]
@@ -12,30 +12,26 @@
 
 (s/def ::env #{:dev :test :prod})
 (s/def ::port pos-int?)
-(s/def ::telegram-token string?)
-(s/def ::endpoint string?)
-(s/def ::use-cases map?)
+(s/def ::messenger record?)
+(s/def ::use-cases record?)
 (s/def ::conf
-  (s/keys :req [::env ::port ::telegram-token ::use-cases ::endpoint]))
-
-(defn app-routes [token endpoint use-cases]
-  (let [handler (service/get-bot token endpoint use-cases)]
-    (routes (POST "/handler" {body :body} (handler body))
-            (route/not-found "Not Found"))))
+  (s/keys :req [::env ::port ::messenger ::use-cases]))
 
 (s/fdef server :args (s/cat :conf ::conf) :ret map?)
-(defn server [{token ::telegram-token endpoint ::endpoint use-cases ::use-cases}]
-  (-> token
-      (app-routes endpoint use-cases)
-      (wrap-json-body {:keywords? true})
-      logger/wrap-log-request-start
-      logger/wrap-log-request-params
-      logger/wrap-log-response))
+(defn server [{messenger ::messenger use-cases ::use-cases}]
+  (let [handler (service/get-bot messenger use-cases)
+        rs (routes (POST "/handler" {body :body} (handler body))
+                   (not-found "Not Found"))]
+    (-> rs
+        (wrap-json-body {:keywords? true})
+        logger/wrap-log-request-start
+        logger/wrap-log-request-params
+        logger/wrap-log-response)))
 
-(defmethod ig/pre-init-spec ::web [_] ::conf)
+(defmethod ig/pre-init-spec :web [_] ::conf)
 
 (defmethod ig/init-key :web [_ {port ::port :as conf}]
-  (jetty/run-jetty (-> conf (dissoc :use-cases) server) {:port port}))
+  (jetty/run-jetty (server conf) {:port port}))
 
 (defmethod ig/halt-key! :web [_ server] (.stop server))
 

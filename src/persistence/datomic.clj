@@ -56,12 +56,13 @@
            [conn]
   Persistence
 
-  (get-user [conn nickname provider]
+  (get-user [{:keys [conn]} nickname provider]
     (d/q user-query (d/db conn) nickname provider))
 
-  (insert-user [conn user-params] (d/transact conn {:tx-data [user-params]}))
+  (insert-user [{:keys [conn]} user-params]
+    (d/transact conn {:tx-data [user-params]}))
 
-  (list-stats [this nickname provider stats-params]))
+  (list-stats [{:keys [conn]} nickname provider stats-params]))
 
 (defmethod ig/pre-init-spec ::datomic [_] ::conf)
 

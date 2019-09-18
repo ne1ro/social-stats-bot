@@ -4,5 +4,6 @@
 (defprotocol Messenger
   "Messenger bot actions behaviour"
 
-  (command [this cmd params] "Parses a messenger command")
-  (send-message [this payload type] "Sends either a message or a photo"))
+  (set-endpoint [conf] "Sets an endpoint for the webhook")
+  (send-message [conf text chat-id] "Sends a message")
+  (send-photo [conf file chat-id] "Sends a photo"))

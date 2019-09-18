@@ -31,12 +31,9 @@
 
   (get-user
     [{{:keys [db social-provider]} :deps} nickname provider]
-    (sp/fetch-user social-provider nickname))
-  ;; (get-user
-  ;;   [{{:keys [db social-provider]} :deps} nickname provider]
-  ;;   (if-let [user (p/get-user db nickname provider)]
-  ;;     user
-  ;;     (fetch-and-insert-user db social-provider nickname)))
+    (if-let [user (p/get-user db nickname provider)]
+      user
+      (fetch-and-insert-user db social-provider nickname)))
 
   (list-stats
     [{{:keys [db graph social-provider]} :deps} nickname provider stats-params]
