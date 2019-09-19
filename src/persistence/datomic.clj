@@ -50,34 +50,35 @@
     :db/cardinality :db.cardinality/one}])
 
 (def user-query '[:find  (pull ?e [*])
-                  :where [?nickname :user/nickname ?provider :user/provider]])
+                  :where [?e :user/nickname ?nickname]
+                         [?e :user/provider ?provider]])
 
 (defrecord Datomic
            [conn]
   Persistence
 
   (get-user [{:keys [conn]} nickname provider]
-    (d/q user-query (d/db conn) nickname provider))
+    (let [res (d/q user-query (d/db conn) nickname provider)]
+     (prn res) res))
 
   (insert-user [{:keys [conn]} user-params]
     (d/transact conn {:tx-data [user-params]}))
 
   (list-stats [{:keys [conn]} nickname provider stats-params]))
 
-(defmethod ig/pre-init-spec ::datomic [_] ::conf)
+(defmethod ig/pre-init-spec :datomic [_] ::conf)
 
 (defmethod ig/init-key :datomic
   [_ {:keys [::access-keys ::endpoint ::db-name] :as db}]
-  (let [[access-key secret] (st/split access-keys #",")]
-    (-> {:access-key access-key
-         :secret secret
-         :server-type :peer-server
-         :validate-hostnames false
-         :endpoint endpoint}
-        d/client
-        (d/connect {:db-name db-name})
-        (d/transact {:tx-data schema})
-        ->Datomic)))
+  (let [[access-key secret] (st/split access-keys #",")
+        conf (d/client {:access-key access-key
+                        :secret secret
+                        :server-type :peer-server
+                        :validate-hostnames false
+                        :endpoint endpoint})
+        conn (d/connect conf {:db-name db-name})]
+    (d/transact conn {:tx-data schema})
+    (->Datomic conn)))
 
 (defmethod ig/halt-key! :datomic [_ _conn] nil)
 

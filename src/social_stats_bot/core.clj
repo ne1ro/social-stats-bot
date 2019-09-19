@@ -12,7 +12,8 @@
 
 (s/def ::env #{"dev" "test" "prod"})
 
-(defonce system (atom nil))
+(defonce system nil)
+(def alter-system ^:private (partial alter-var-root #'system))
 
 (defn tag-env
   "Implements #env extension for EDN files"
@@ -34,21 +35,20 @@
 (defn start
   "Starts a system"
   [env]
-  (->> env config ig/init constantly (alter-var-root #'system)))
+  (let [conf (config env)]
+    (alter-system (constantly (ig/init conf)))))
 
 (defn stop
   "Stops a system"
   []
   (println "\nStopping a system...")
-  (ig/halt! @system))
+  (alter-system ig/halt!))
 
 (defn -main
   "The entry-point for 'lein run'"
   [& args]
   (println "\nRunning a system...")
   (let [env (or (System/getenv "ENV") "dev")] (start env)))
-
-(-main)
 
 (st/instrument)
 

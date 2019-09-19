@@ -24,7 +24,7 @@
     (t/send-text token chat-id text))
 
   (send-photo [{{token ::token} :conf} photo chat-id]
-    (t/send-photo token chat-id photo)))
+    (when photo (t/send-photo token chat-id photo))))
 
 (defmethod ig/pre-init-spec :telegram [_] ::conf)
 
