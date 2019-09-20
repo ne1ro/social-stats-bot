@@ -1,0 +1,10 @@
+{:provider-local {:base-url "https://www.instagram.com/" :suffix "/?__a=1"}
+ :datomic {:persistence.datomic/db-name "social-stats-test"
+           :persistence.datomic/access-keys #env DATOMIC_KEYS
+           :persistence.datomic/endpoint "localhost:8998"}
+ :messenger-local {:messenger.messenger-local/endpoint "http://localhost:8081/handler"}
+ :use-cases {:db #ig/ref :datomic :social-provider #ig/ref :provider-local}
+ :web {:web.server/port 8081
+       :web.server/use-cases #ig/ref :use-cases
+       :web.server/messenger #ig/ref :messenger-local
+       :web.server/env :test}}
