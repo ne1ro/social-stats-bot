@@ -4,10 +4,23 @@
             [social-stats-bot.persistence :as p]
             [social-stats-bot.graph :as g]
             [social-stats-bot.social-provider :as sp]
-            [integrant.core :as ig]))
+            [integrant.core :as ig]
+            [clojure.spec.alpha :as s]
+            [clojure.spec.test.alpha :as st]))
 
+(s/def ::db record?)
+(s/def ::social-provider record?)
+
+(s/fdef fetch-and-insert-user
+  :args (s/cat :db ::db
+         :social-provider ::social-provider
+         :nickname ::domain/nickname)
+  :ret map?)
 (defn- fetch-and-insert-user [db social-provider nickname]
-  (some->> nickname (sp/fetch-user social-provider) (p/insert-user db)))
+  (some->> nickname
+           (sp/fetch-user social-provider)
+           (s/conform ::domain/user)
+           (p/insert-user db)))
 
 (defn- draw-graph [db nickname provider graph stats-params user]
   (some-> db
@@ -26,13 +39,13 @@
 
 ;; Implementation of social stats use cases
 (defrecord SocialStatsUseCases
-    [deps]
+           [deps]
   SocialStatsBot
 
   (get-user
     [{{:keys [db social-provider]} :deps} nickname provider]
     (if-let [user (p/get-user db nickname provider)]
-      user
+      (do (prn user) user)
       (fetch-and-insert-user db social-provider nickname)))
 
   (list-stats
@@ -47,8 +60,9 @@
          :graph (draw-graph db nickname provider graph stats-params new-user)}))))
 
 ;; Configure use cases on startup
-(defmethod ig/init-key :use-cases
-  [_ {:keys [db social-provider graph] :as dependencies}]
+(defmethod ig/init-key :use-cases [_ dependencies]
   (->SocialStatsUseCases dependencies))
 
 (defmethod ig/halt-key! :use-cases [_ _] nil)
+
+(st/instrument)
