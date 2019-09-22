@@ -9,5 +9,5 @@
                                     :followers-count (rand-int 10)
                                     :followings-count (rand-int 10)
                                     :avatar (-> f .avatar .image)
-                                    :last-fetched-at nil}]
+                                    :last-fetched-at (java.util.Date.)}]
     (if-not (empty? args) (apply assoc (cons default-user args)) default-user)))

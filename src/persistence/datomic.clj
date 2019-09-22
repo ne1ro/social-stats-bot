@@ -59,7 +59,7 @@
 
   (get-user [{:keys [conn]} nickname provider]
     (let [res (d/q user-query (d/db conn) nickname provider)]
-     (prn res) res))
+     (prn res) (first res)))
 
   (insert-user [{:keys [conn]} user-params]
     (d/transact conn {:tx-data [user-params]}))

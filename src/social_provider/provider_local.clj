@@ -1,6 +1,6 @@
-(ns social-provider.local
+(ns social-provider.provider-local
   (:require [social-stats-bot.social-provider :refer [SocialProvider]]
-            [social-stats-bot :refer [build-user]]
+            [social-stats-bot.user-factory :refer [build-user]]
             [integrant.core :as ig]))
 
 (defrecord ProviderLocal
@@ -8,7 +8,7 @@
   SocialProvider
 
   (fetch-user [_conf nickname]
-    (build-user :nickname nickname :provider "instagram")))
+    (build-user :nickname nickname :provider :instagram)))
 
 (defmethod ig/init-key :provider-local [_ conf] (->ProviderLocal conf))
 (defmethod ig/halt-key! :provider-local [_ _] nil)

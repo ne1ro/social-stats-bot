@@ -4,9 +4,11 @@
   (:require [integrant.core :as ig]
             [clojure.spec.alpha :as s]
             [clojure.spec.test.alpha :as st]
+            [messenger.messenger-local]
             [messenger.telegram]
             [persistence.datomic]
             [social-provider.instagram]
+            [social-provider.provider-local]
             [social-stats-bot.use-cases]
             [web.server]))
 

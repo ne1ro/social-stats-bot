@@ -13,14 +13,15 @@
 
 (s/fdef fetch-and-insert-user
   :args (s/cat :db ::db
-         :social-provider ::social-provider
-         :nickname ::domain/nickname)
+               :social-provider ::social-provider
+               :nickname ::domain/nickname)
   :ret map?)
 (defn- fetch-and-insert-user [db social-provider nickname]
-  (some->> nickname
-           (sp/fetch-user social-provider)
-           (s/conform ::domain/user)
-           (p/insert-user db)))
+  (let [user (sp/fetch-user social-provider nickname)
+        explain (s/explain-data ::domain/user user)]
+    (if explain
+      (throw (ex-info "Validation failed" {:explain explain}))
+      (p/insert-user db user))))
 
 (defn- draw-graph [db nickname provider graph stats-params user]
   (some-> db

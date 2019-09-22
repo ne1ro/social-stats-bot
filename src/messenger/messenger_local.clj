@@ -7,7 +7,7 @@
     [conf]
   Messenger
 
-  (set-endpoint [_conf _] nil)
+  (set-endpoint [_conf] nil)
   (send-message [_conf m _chat-id] m)
   (send-photo [_conf photo _chat-id] photo))
 
