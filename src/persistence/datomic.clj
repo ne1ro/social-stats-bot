@@ -5,6 +5,7 @@
             [clojure.spec.test.alpha :as stest]
             [clojure.string :as st]
             [datomic.client.api :as d]
+            ;; [datomic.api :as dapi]
             [social-stats-bot.persistence :refer [Persistence]]))
 
 (s/def ::endpoint string?)
@@ -51,7 +52,24 @@
 
 (def user-query '[:find  (pull ?e [*])
                   :where [?e :user/nickname ?nickname]
-                         [?e :user/provider ?provider]])
+                  [?e :user/provider ?provider]])
+
+(defn- ->db-user [user]
+  (let [ks (keys user)
+        renamed-ks (map #(keyword "user" (name %)) ks)]
+    (clojure.set/rename-keys user (zipmap ks renamed-ks))))
+
+(defn- db-conn [endpoint access-keys db-name]
+  ;; TODO: handle in-memory connections by multimethods
+  (when (= endpoint "datomic:mem://")
+    (do (dapi/create-database (str endpoint db-name)))
+    (let [[access-key secret] (st/split access-keys #",")
+          conf (d/client {:access-key access-key
+                          :secret secret
+                          :server-type :peer-server
+                          :validate-hostnames false
+                          :endpoint endpoint})]
+      (d/connect conf {:db-name db-name}))))
 
 (defrecord Datomic
            [conn]
@@ -59,10 +77,11 @@
 
   (get-user [{:keys [conn]} nickname provider]
     (let [res (d/q user-query (d/db conn) nickname provider)]
-     (prn res) (first res)))
+      (prn res) (first res)))
 
   (insert-user [{:keys [conn]} user-params]
-    (d/transact conn {:tx-data [user-params]}))
+    (when (d/transact conn {:tx-data [(->db-user user-params)]})
+      user-params))
 
   (list-stats [{:keys [conn]} nickname provider stats-params]))
 
@@ -70,15 +89,9 @@
 
 (defmethod ig/init-key :datomic
   [_ {:keys [::access-keys ::endpoint ::db-name] :as db}]
-  (let [[access-key secret] (st/split access-keys #",")
-        conf (d/client {:access-key access-key
-                        :secret secret
-                        :server-type :peer-server
-                        :validate-hostnames false
-                        :endpoint endpoint})
-        conn (d/connect conf {:db-name db-name})]
-    (d/transact conn {:tx-data schema})
-    (->Datomic conn)))
+  (let [conn (db-conn endpoint access-keys db-name)]
+    (prn "CONNь" conn)
+    (d/transact conn {:tx-data schema}) (->Datomic conn)))
 
 (defmethod ig/halt-key! :datomic [_ _conn] nil)
 
