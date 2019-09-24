@@ -1,6 +1,5 @@
 {:provider-local {:base-url "https://www.instagram.com/" :suffix "/?__a=1"}
  :datomic {:persistence.datomic/db-name "social-stats-test"
-           :persistence.datomic/access-keys #env DATOMIC_KEYS
            :persistence.datomic/endpoint "datomic:mem://"}
  :messenger-local {:messenger.messenger-local/endpoint "http://localhost:8081/handler"}
  :use-cases {:db #ig/ref :datomic :social-provider #ig/ref :provider-local}

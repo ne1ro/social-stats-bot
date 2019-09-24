@@ -4,14 +4,12 @@
             [clojure.spec.alpha :as s]
             [clojure.spec.test.alpha :as stest]
             [clojure.string :as st]
-            [datomic.client.api :as d]
-            ;; [datomic.api :as dapi]
+            [datomic.api :as d]
             [social-stats-bot.persistence :refer [Persistence]]))
 
 (s/def ::endpoint string?)
-(s/def ::access-keys string?)
 (s/def ::db-name string?)
-(s/def ::conf (s/keys :req [::endpoint ::access-keys ::db-name]))
+(s/def ::conf (s/keys :req [::endpoint ::db-name]))
 
 (def schema
   [{:db/ident :user/provider
@@ -59,17 +57,11 @@
         renamed-ks (map #(keyword "user" (name %)) ks)]
     (clojure.set/rename-keys user (zipmap ks renamed-ks))))
 
-(defn- db-conn [endpoint access-keys db-name]
-  ;; TODO: handle in-memory connections by multimethods
+(defn- db-conn [endpoint db-name]
   (when (= endpoint "datomic:mem://")
-    (do (dapi/create-database (str endpoint db-name)))
-    (let [[access-key secret] (st/split access-keys #",")
-          conf (d/client {:access-key access-key
-                          :secret secret
-                          :server-type :peer-server
-                          :validate-hostnames false
-                          :endpoint endpoint})]
-      (d/connect conf {:db-name db-name}))))
+    (let [addr (str endpoint db-name)]
+      (d/create-database addr)
+      (d/connect addr))))
 
 (defrecord Datomic
            [conn]
@@ -88,10 +80,9 @@
 (defmethod ig/pre-init-spec :datomic [_] ::conf)
 
 (defmethod ig/init-key :datomic
-  [_ {:keys [::access-keys ::endpoint ::db-name] :as db}]
-  (let [conn (db-conn endpoint access-keys db-name)]
-    (prn "CONNь" conn)
-    (d/transact conn {:tx-data schema}) (->Datomic conn)))
+  [_ {:keys [::endpoint ::db-name] :as db}]
+  (let [conn (db-conn endpoint db-name)]
+    (d/transact conn [{:tx-data schema}]) (->Datomic conn)))
 
 (defmethod ig/halt-key! :datomic [_ _conn] nil)
 

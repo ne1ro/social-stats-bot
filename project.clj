@@ -5,7 +5,6 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [clj-http "3.10.0"]
-                 [com.datomic/client-pro "0.9.37"]
                  [com.datomic/datomic-free "0.9.5656"]
                  [com.github.javafaker/javafaker "0.16"]
                  [compojure "1.6.1"]
