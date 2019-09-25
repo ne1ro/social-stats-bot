@@ -48,9 +48,9 @@
     :db/valueType :db.type/instant
     :db/cardinality :db.cardinality/one}])
 
-(def user-query '[:find  (pull ?e [*])
-                  :where [?e :user/nickname ?nickname]
-                  [?e :user/provider ?provider]])
+(def user-query '[:find  ?user
+                  :where [?user :user/nickname ?nickname]
+                  [?user :user/provider ?provider]])
 
 (defn- ->db-user [user]
   (let [ks (keys user)
@@ -68,11 +68,11 @@
   Persistence
 
   (get-user [{:keys [conn]} nickname provider]
-    (let [res (d/q user-query (d/db conn) nickname provider)]
+    (let [res (d/q user-query (d/db conn) [nickname provider])]
       (prn res) (first res)))
 
   (insert-user [{:keys [conn]} user-params]
-    (when (d/transact conn {:tx-data [(->db-user user-params)]})
+    (when (d/transact conn [{:tx-data [(->db-user user-params)]}])
       user-params))
 
   (list-stats [{:keys [conn]} nickname provider stats-params]))
@@ -82,7 +82,8 @@
 (defmethod ig/init-key :datomic
   [_ {:keys [::endpoint ::db-name] :as db}]
   (let [conn (db-conn endpoint db-name)]
-    (d/transact conn [{:tx-data schema}]) (->Datomic conn)))
+    @(d/transact conn schema)
+    (->Datomic conn)))
 
 (defmethod ig/halt-key! :datomic [_ _conn] nil)
 

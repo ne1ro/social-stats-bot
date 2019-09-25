@@ -21,6 +21,7 @@
             [lein-cljfmt "0.6.4"]
             [lein-kibit "0.1.6"]
             [io.aviso/pretty "0.1.37"]
+            [lein-cloverage "1.1.1"]
             [lein-figwheel "0.5.18"]]
   :middleware [io.aviso.lein-pretty/inject]
   :min-lein-version "2.0.0"

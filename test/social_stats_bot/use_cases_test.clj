@@ -26,4 +26,5 @@
   (testing "fetches and insert user if it hasn't been saved before"
     (let [user (-> *system* :use-cases (get-user "test-user" "instagram"))]
       (is (= (:nickname user) "test-user"))
+      (is (= (:provider user) :instagram))
       (is (= (s/valid? user ::d/user))))))
