@@ -1,8 +1,9 @@
-name: Clojure CI
+name: ClojureCI
 
 on:
   pull_request:
     branches:
+      - master
   push:
     branches:
     - master
@@ -22,5 +23,6 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - run: lein deps
-      - run: lein cljmft check
+      - run: lein check
       - run: lein kibit
+      # - run: lein cljmft check

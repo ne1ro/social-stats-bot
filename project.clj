@@ -26,7 +26,7 @@
   :min-lein-version "2.0.0"
   :resource-paths ["config", "resources"]
   :profiles {:dev {:resource-paths ["resources/dev"]
-                   :dependencies [[integrant/repl "0.3.1"]]}
+                   :dependencies [[integrant/repl "0.3.1"] [lein-cljfmt "0.6.4"]]}
              :test {:resource-paths ["resources/test"]
                     :dependencies [[lein-cloverage "1.1.1"]]}
              :prod {:resource-paths ["resources/prod"]}

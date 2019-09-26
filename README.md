@@ -1,6 +1,11 @@
 # social-stats-bot
 
-FIXME
+Messenger bot that shows some social stats.
+
+
+## CI
+
+![](https://github.com/ne1ro/social-stats-bot/workflows/ClojureCI/badge.svg)
 
 ## Getting Started
 
@@ -9,13 +14,6 @@ FIXME
 3. Read your app's source code at src/social_stats_bot/service.clj. Explore the docs of functions
    that define routes and responses.
 4. Run your app's tests with `lein test`. Read the tests at test/social_stats_bot/service_test.clj.
-5. Learn more! See the [Links section below](#links).
-
-
-## Configuration
-
-To configure logging see config/logback.xml. By default, the app logs to stdout and logs/.
-To learn more about configuring Logback, read its [documentation](http://logback.qos.ch/documentation.html).
 
 
 ## Developing your service
@@ -31,15 +29,3 @@ To learn more about configuring Logback, read its [documentation](http://logback
 2. Build an uberjar of your service: `lein uberjar`
 3. Build a Docker image: `sudo docker build -t social-stats-bot .`
 4. Run your Docker image: `docker run -p 8080:8080 social-stats-bot`
-
-### [OSv](http://osv.io/) unikernel support with [Capstan](http://osv.io/capstan/)
-
-1. Build and run your image: `capstan run -f "8080:8080"`
-
-Once the image it built, it's cached.  To delete the image and build a new one:
-
-1. `capstan rmi social-stats-bot; capstan build`
-
-
-## Links
-* [Other Pedestal examples](http://pedestal.io/samples)

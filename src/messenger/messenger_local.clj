@@ -4,7 +4,7 @@
             [integrant.core :as ig]))
 
 (defrecord MessengerLocal
-    [conf]
+           [conf]
   Messenger
 
   (set-endpoint [_conf] nil)
