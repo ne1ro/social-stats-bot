@@ -1,0 +1,26 @@
+name: Clojure CI
+
+on:
+  pull_request:
+    branches:
+  push:
+    branches:
+    - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install dependencies
+        run: lein deps
+      - name: Run tests
+        run: lein cloverage
+
+  code_style:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: lein deps
+      - run: lein cljmft check
+      - run: lein kibit
