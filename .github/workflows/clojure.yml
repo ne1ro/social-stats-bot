@@ -26,3 +26,9 @@ jobs:
       - run: lein check
       - run: lein kibit
       # - run: lein cljmft check
+
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - run: ENV=prod lein uberjar
