@@ -1,0 +1,13 @@
+{
+ :instagram {:base-url "https://www.instagram.com/" :suffix "/?__a=1"}
+ :datomic {:persistence.datomic/db-name "social-stats"
+           :persistence.datomic/endpoint "datomic:mem://"}
+ ;; :graph {}
+ :telegram {:messenger.telegram/endpoint #TELEGRAM_ENDPOINT
+            :messenger.telegram/token #env TELEGRAM_TOKEN}
+ :use-cases {:db #ig/ref :datomic :social-provider #ig/ref :instagram}
+ :web {:web.server/port 8080
+       :web.server/use-cases #ig/ref :use-cases
+       :web.server/messenger #ig/ref :telegram
+       :web.server/env :prod}
+}
