@@ -32,3 +32,14 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - run: ENV=prod lein uberjar
+      - name: copy file via ssh
+        uses: maddox/actions/ssh@master
+        env:
+          HOST: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          PORT: ${{ secrets.PORT }}
+          KEY: ${{ secrets.KEY }}
+          PRIVATE_KEY: ${{ secrets.KEY }}
+        with:
+          source: "./target/social-stats-bot-0.0.1-SNAPSHOT-standalone.jar"
+          target: ",/home/neiro/social-stats-bot.jar"
