@@ -7,6 +7,7 @@
             [messenger.messenger-local]
             [messenger.telegram]
             [persistence.datomic]
+            [taoensso.timbre :as timbre :refer [info]]
             [social-provider.instagram]
             [social-provider.provider-local]
             [social-stats-bot.use-cases]
@@ -49,8 +50,9 @@
 (defn -main
   "The entry-point for 'lein run'"
   [& args]
-  (println "\nRunning a system...")
-  (let [env (or (System/getenv "ENV") "dev")] (start env)))
+  (info "\nRunning a system...")
+  (let [env (or (System/getenv "ENV") "dev")] (start env))
+  (info (str "Runned a system with configuration: " system)))
 
 (st/instrument)
 
