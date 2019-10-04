@@ -10,18 +10,22 @@
 
 (s/def ::db record?)
 (s/def ::social-provider record?)
+(s/def ::current-date record?)
 
 (s/fdef fetch-and-insert-user
   :args (s/cat :db ::db
+               :current-date ::current-date
                :social-provider ::social-provider
                :nickname ::domain/nickname)
   :ret map?)
-(defn- fetch-and-insert-user [db social-provider nickname]
+(defn- fetch-and-insert-user [db current-date social-provider nickname]
   (let [user (sp/fetch-user social-provider nickname)
         explain (s/explain-data ::domain/user user)]
     (if explain
       (throw (ex-info "Validation failed" {:explain explain}))
-      (p/insert-user db user))))
+      (-> user
+          (assoc :last-fetched-at (.get-date current-date))
+          #(p/insert-db db %)))))
 
 (defn- draw-graph [db nickname provider graph stats-params user]
   (some-> db
@@ -44,10 +48,11 @@
   SocialStatsBot
 
   (get-user
-    [{{:keys [db social-provider]} :deps} nickname provider]
+    [{{:keys [db social-provider current-date]} :deps}
+     nickname provider]
     (if-let [user (p/get-user db nickname provider)]
-      (do (prn user) user)
-      (fetch-and-insert-user db social-provider nickname)))
+      user
+      (fetch-and-insert-user db current-date social-provider nickname)))
 
   (list-stats
     [{{:keys [db graph social-provider]} :deps} nickname provider stats-params]

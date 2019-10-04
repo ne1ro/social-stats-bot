@@ -17,7 +17,6 @@
      :avatar profile_pic_url_hd
      :posts-count (:count edge_owner_to_timeline_media)
      :followers-count (:count edge_followed_by)
-     :last-fetched-at (java.util.Date.)
      :followings-count (:count edge_follow)}))
 
 (defrecord Instagram
