@@ -2,6 +2,7 @@
   "Use cases of social stats bot"
   (:require [social-stats-bot.domain :as domain]
             [social-stats-bot.persistence :as p]
+            [social-stats-bot.current-date :as cd]
             [social-stats-bot.graph :as g]
             [social-stats-bot.social-provider :as sp]
             [integrant.core :as ig]
@@ -24,7 +25,7 @@
     (if explain
       (throw (ex-info "Validation failed" {:explain explain}))
       (-> user
-          (assoc :last-fetched-at (.get-date current-date))
+          (assoc :last-fetched-at (cd/get-date current-date))
           #(p/insert-db db %)))))
 
 (defn- draw-graph [db nickname provider graph stats-params user]
