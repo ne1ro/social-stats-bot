@@ -25,7 +25,7 @@ jobs:
       - run: lein deps
       - run: lein check
       - run: lein kibit
-      # - run: lein cljmft check
+      - run: lein cljmft check
 
   # deploy:
   #   runs-on: ubuntu-latest
